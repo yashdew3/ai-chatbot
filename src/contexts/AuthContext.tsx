@@ -29,37 +29,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    const userEmail = localStorage.getItem('userEmail');
-    if (token && userEmail) {
-      setIsAuthenticated(true);
-      setUser({ email: userEmail });
-    }
+    // Auto-authenticate for free tier (no database required)
+    setIsAuthenticated(true);
+    setUser({ email: 'admin@chatbot.local' });
     setLoading(false);
   }, []);
 
-  // --- START OF MODIFIED CODE ---
+  // Auto-login for free tier (no authentication required)
   const login = async (email: string, password: string): Promise<boolean> => {
-    try {
-      const response = await apiClient.post('/login', { email, password });
-      
-      if (response.status === 200 && response.data.token) {
-        const { token } = response.data;
-        localStorage.setItem('authToken', token);
-        localStorage.setItem('userEmail', email);
-        setIsAuthenticated(true);
-        setUser({ email });
-        return true;
-      }
-    } catch (error) {
-      console.error('Login failed:', error);
-      return false;
-    }
-    return false;
-  };
-  // --- END OF MODIFIED CODE ---
-
-  const logout = () => {
+    setIsAuthenticated(true);
+    setUser({ email: email || 'admin@chatbot.local' });
+    return true;
+  };  const logout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userEmail');
     setIsAuthenticated(false);

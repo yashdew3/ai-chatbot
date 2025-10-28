@@ -3,7 +3,7 @@ import axios from 'axios';
 // Create an Axios instance configured to talk to your backend
 const apiClient = axios.create({
   // Environment-based configuration for production deployment
-  baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000',
+  baseURL: import.meta.env.VITE_API_URL || 'https://ai-chatbot-api-n1vm.onrender.com',
   headers: {
     'Content-Type': 'application/json',
   },

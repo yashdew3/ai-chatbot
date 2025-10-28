@@ -56,13 +56,14 @@ This guide will help you deploy your document-based chatbot to Render with full 
    Environment: Python 3
    Region: Oregon (US West) or closest to you
    Branch: main
-   Root Directory: (leave empty - uses project root)
+   Root Directory: backend
+   Runtime: Use runtime.txt
    ```
 
 5. **Build & Deploy Settings**:
    ```
-   Build Command: cd backend && pip install --upgrade pip && pip install -r requirements_simple.txt
-   Start Command: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+   Build Command: pip install --upgrade pip && pip install -r requirements_simple.txt
+   Start Command: uvicorn main:app --host 0.0.0.0 --port $PORT
    ```
 
 6. **Environment Variables**:
