@@ -1,0 +1,167 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Futuristic AI Chatbot Management System Design Tokens */
+
+@layer base {
+  :root {
+    /* Light theme colors */
+    --background: 0 0% 98%;              /* Almost white */
+    --foreground: 0 0% 15%;              /* Dark text */
+
+    --card: 0 0% 100%;                   /* Pure white */
+    --card-foreground: 0 0% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 15%;
+
+    /* Electric cyan accent system */
+    --primary: 180 100% 40%;             /* Slightly darker cyan for light theme */
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 220 13% 91%;            /* Light grey */
+    --secondary-foreground: 0 0% 15%;
+
+    --muted: 220 14% 96%;                /* Very light grey */
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 180 100% 40%;              /* Electric cyan */
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 70% 50%;            /* Red for errors */
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 220 13% 91%;               /* Light borders */
+    --input: 220 13% 91%;                /* Light input backgrounds */
+    --ring: 180 100% 40%;                /* Cyan focus rings */
+
+    /* Design system tokens */
+    --radius: 0.75rem;
+    
+    /* Glassmorphism effects for light theme */
+    --glass-bg: 0 0% 100% / 0.8;         /* Semi-transparent white */
+    --glass-border: 220 13% 91% / 0.5;   /* Light glass border */
+    --glass-shadow: 0 8px 32px 0 rgb(0 0 0 / 0.1);
+    
+    /* Status colors */
+    --success: 142 76% 36%;              /* Green for indexed */
+    --warning: 48 96% 53%;               /* Yellow for processing */
+    --error: 0 70% 50%;                  /* Red for errors */
+    
+    /* Gradients for light theme */
+    --gradient-primary: linear-gradient(135deg, hsl(180 100% 40%) 0%, hsl(195 100% 35%) 100%);
+    --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.1) 0%, hsl(220 13% 91% / 0.1) 100%);
+    --gradient-bg: radial-gradient(circle at 20% 50%, hsl(220 13% 96%) 0%, hsl(0 0% 98%) 100%);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .dark {
+    /* Dark theme colors */
+    --background: 0 0% 10%;              /* Charcoal grey #1A1A1A */
+    --foreground: 0 0% 95%;              /* Light text */
+
+    --card: 220 39% 17%;                 /* Deep slate blue #1F2937 */
+    --card-foreground: 0 0% 95%;
+
+    --popover: 220 39% 17%;
+    --popover-foreground: 0 0% 95%;
+
+    /* Electric cyan accent system */
+    --primary: 180 100% 50%;             /* Electric cyan #00FFFF */
+    --primary-foreground: 0 0% 10%;
+
+    --secondary: 220 39% 25%;            /* Lighter slate */
+    --secondary-foreground: 0 0% 90%;
+
+    --muted: 220 39% 15%;                /* Darker slate */
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 180 100% 50%;              /* Electric cyan */
+    --accent-foreground: 0 0% 10%;
+
+    --destructive: 0 70% 55%;            /* Red for errors */
+    --destructive-foreground: 0 0% 95%;
+
+    --border: 220 39% 20%;               /* Subtle borders */
+    --input: 220 39% 15%;                /* Input backgrounds */
+    --ring: 180 100% 50%;                /* Cyan focus rings */
+
+    /* Glassmorphism effects for dark theme */
+    --glass-bg: 220 39% 17% / 0.8;       /* Semi-transparent slate */
+    --glass-border: 220 39% 25% / 0.3;   /* Subtle glass border */
+    --glass-shadow: 0 8px 32px 0 rgb(0 0 0 / 0.37);
+    
+    /* Status colors */
+    --success: 142 76% 36%;              /* Green for indexed */
+    --warning: 48 96% 53%;               /* Yellow for processing */
+    --error: 0 70% 55%;                  /* Red for errors */
+    
+    /* Gradients for dark theme */
+    --gradient-primary: linear-gradient(135deg, hsl(180 100% 50%) 0%, hsl(195 100% 45%) 100%);
+    --gradient-glass: linear-gradient(135deg, hsl(220 39% 17% / 0.1) 0%, hsl(220 39% 25% / 0.1) 100%);
+    --gradient-bg: radial-gradient(circle at 20% 50%, hsl(220 39% 15%) 0%, hsl(0 0% 10%) 100%);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    background: var(--gradient-bg);
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  /* Glassmorphism utilities */
+  .glass {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow: var(--glass-shadow);
+  }
+  
+  .glass-card {
+    @apply glass rounded-xl;
+  }
+  
+  /* Status badge variants */
+  .status-indexed {
+    @apply bg-green-500/20 text-green-400 border border-green-500/30;
+  }
+  
+  .status-processing {
+    @apply bg-yellow-500/20 text-yellow-400 border border-yellow-500/30;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .status-error {
+    @apply bg-red-500/20 text-red-400 border border-red-500/30;
+  }
+  
+  /* Smooth transitions */
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+  
+  .transition-spring {
+    transition: var(--transition-spring);
+  }
+  
+  /* Hover effects */
+  .hover-lift {
+    @apply transition-smooth hover:translate-y-[-2px] hover:shadow-lg;
+  }
+  
+  .hover-glow {
+    @apply transition-smooth hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)];
+  }
+}
