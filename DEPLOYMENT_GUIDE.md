@@ -69,12 +69,11 @@ This guide will help you deploy your document-based chatbot to Render with full 
    - Click "Advanced" → "Add Environment Variable"
    - Add: `GOOGLE_API_KEY` = `AIzaSyDxkp6DDyHfOb_pGyqLnoCgusRjUch2ZOA`
 
-7. **Add Persistent Storage**:
-   - Go to "Settings" → "Disks"
-   - Click "Add Disk"
-   - Name: `chatbot-data`
-   - Mount Path: `/opt/render/project/src/backend/data`
-   - Size: 1 GB
+7. **❗ SKIP Persistent Storage** (Free Tier):
+   - **Free tier doesn't support disks** - that's okay!
+   - Your app uses **in-memory storage** instead
+   - Documents will be temporary (lost on restart)
+   - This is normal for free tier deployment
 
 8. **Deploy**:
    - Click "Create Web Service"
@@ -127,7 +126,65 @@ This guide will help you deploy your document-based chatbot to Render with full 
 
 ---
 
-## � **What to Push to GitHub**
+## 🆓 **Free Tier Limitations & Solutions**
+
+### **What Happens on Free Tier**:
+- ✅ **App works perfectly** for testing and demo
+- ⚠️ **Documents stored in memory only** (not persistent)
+- ⚠️ **Service sleeps after 15 minutes** of inactivity  
+- ⚠️ **Documents lost when service restarts** (cold start)
+
+### **User Experience**:
+- Upload documents → Works immediately
+- Chat with documents → Works perfectly
+- Service sleeps → Documents are lost
+- User returns → Needs to re-upload documents
+- **Perfect for demos and testing!**
+
+### **If You Need Persistence**:
+**Option A: Upgrade to Paid Plan** ($7/month)
+- Add persistent disk storage
+- Documents survive restarts
+- No cold starts
+
+**Option B: Use Supabase Free Tier** (Database storage)
+- 500MB free database
+- Documents stored in PostgreSQL
+- Survives restarts even on free tier
+- Setup instructions below ⬇️
+
+---
+
+## 🗄️ **Optional: Supabase Integration (Free Tier)**
+
+### **Why Use Supabase?**
+- **Free tier**: 500MB database (plenty for document text)
+- **Persistent**: Documents survive service restarts
+- **Still free**: Works with Render free tier
+
+### **Quick Setup**:
+1. **Create Supabase account**: https://supabase.com (free)
+2. **Create new project**: Note your URL and API key
+3. **Create table in SQL editor**:
+   ```sql
+   CREATE TABLE documents (
+       id TEXT PRIMARY KEY,
+       name TEXT NOT NULL,
+       type TEXT NOT NULL,
+       status TEXT NOT NULL,
+       date_added TIMESTAMP DEFAULT NOW(),
+       size_kb NUMERIC,
+       content TEXT
+   );
+   ```
+4. **Update backend environment variables**:
+   - `SUPABASE_URL` = your_project_url
+   - `SUPABASE_KEY` = your_anon_key
+5. **Switch to Supabase version**: Replace main.py content with database version
+
+---
+
+## 📁 **What to Push to GitHub**
 
 ### **Include These Files**:
 ```

@@ -1,5 +1,4 @@
 import os
-import json
 import uvicorn
 from datetime import datetime
 from fastapi import FastAPI, UploadFile, File, HTTPException
@@ -9,6 +8,7 @@ from typing import List, Optional
 import PyPDF2
 import google.generativeai as genai
 from dotenv import load_dotenv
+import io
 
 # Load environment variables
 load_dotenv()
@@ -22,9 +22,9 @@ else:
     print("✗ Warning: GOOGLE_API_KEY not found in environment variables")
 
 # Initialize FastAPI
-app = FastAPI(title="Simple Chatbot API", version="2.0.0")
+app = FastAPI(title="AI Chatbot API - Free Tier", version="2.0.0")
 
-# CORS Configuration - Updated for production
+# CORS Configuration
 FRONTEND_URLS = [
     "http://localhost:3000",
     "http://localhost:8080", 
@@ -40,14 +40,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Constants - Updated for persistent storage
-DATA_PATH = os.getenv("DATA_PATH", "/opt/render/project/src/data")
-DOCUMENTS_DB = os.path.join(DATA_PATH, "documents.json")
-
-# Ensure directories exist
-os.makedirs(DATA_PATH, exist_ok=True)
-
-# In-memory storage for document content
+# In-memory storage ONLY (no file system dependency)
 documents_store = {}
 documents_metadata = []
 
@@ -58,66 +51,18 @@ class LoginRequest(BaseModel):
     email: str
     password: str
 
-def load_documents_database():
-    """Load documents metadata from JSON file"""
-    global documents_metadata
-    try:
-        if os.path.exists(DOCUMENTS_DB):
-            with open(DOCUMENTS_DB, 'r') as f:
-                documents_metadata = json.load(f)
-            print(f"Loaded {len(documents_metadata)} documents from database")
-        else:
-            documents_metadata = []
-    except Exception as e:
-        print(f"Error loading documents database: {e}")
-        documents_metadata = []
-
-def save_documents_database():
-    """Save documents metadata to JSON file"""
-    try:
-        with open(DOCUMENTS_DB, 'w') as f:
-            json.dump(documents_metadata, f, indent=2)
-        print("Documents database saved")
-    except Exception as e:
-        print(f"Error saving documents database: {e}")
-
-def extract_text_from_pdf(file_path):
-    """Extract text from PDF file"""
+def extract_text_from_pdf_bytes(file_content: bytes):
+    """Extract text from PDF bytes (in-memory processing)"""
     try:
         text = ""
-        with open(file_path, 'rb') as file:
-            pdf_reader = PyPDF2.PdfReader(file)
-            for page in pdf_reader.pages:
-                text += page.extract_text() + "\n"
+        pdf_file = io.BytesIO(file_content)
+        pdf_reader = PyPDF2.PdfReader(pdf_file)
+        for page in pdf_reader.pages:
+            text += page.extract_text() + "\n"
         return text.strip()
     except Exception as e:
-        print(f"Error extracting text from {file_path}: {e}")
+        print(f"Error extracting text from PDF: {e}")
         return ""
-
-def load_existing_documents():
-    """Load existing documents from the data directory"""
-    global documents_store
-    
-    if not os.path.exists(DATA_PATH):
-        return
-    
-    # Load metadata
-    load_documents_database()
-    
-    # Load document content into memory
-    for doc_meta in documents_metadata:
-        doc_id = doc_meta['id']
-        file_path = os.path.join(DATA_PATH, doc_id)
-        
-        if os.path.exists(file_path):
-            if doc_meta['type'] == 'pdf':
-                text_content = extract_text_from_pdf(file_path)
-                documents_store[doc_id] = text_content
-                print(f"Loaded document: {doc_id}")
-            else:
-                print(f"Unsupported document type: {doc_meta['type']}")
-        else:
-            print(f"Document file missing: {file_path}")
 
 def search_documents(query, threshold=0.1):
     """Simple keyword-based document search"""
@@ -150,23 +95,30 @@ def search_documents(query, threshold=0.1):
 
 @app.on_event("startup")
 async def startup_event():
-    """Load existing documents on startup"""
-    print("Starting Simple Chatbot API...")
-    load_existing_documents()
-    print(f"Loaded {len(documents_store)} documents into memory")
+    """Startup message for free tier deployment"""
+    print("🚀 Starting AI Chatbot API - Free Tier Mode")
+    print("📝 Note: Documents are stored in memory only")
+    print("🔄 Documents will be lost when service restarts/sleeps")
+    print("💡 Users will need to re-upload documents after cold starts")
 
 @app.get("/")
 def health_check():
-    return {"status": "ok", "message": "Simple Chatbot API is running!", "port": os.getenv("PORT", "8000")}
+    return {
+        "status": "ok", 
+        "message": "AI Chatbot API is running on Free Tier!",
+        "mode": "in-memory-only",
+        "note": "Documents are temporary and lost on restart"
+    }
 
 @app.get("/test")
 def test_endpoint():
     return {
         "status": "success",
         "message": "Connection test successful!",
-        "data_path": DATA_PATH,
         "documents_loaded": len(documents_store),
         "gemini_configured": bool(GOOGLE_API_KEY),
+        "storage_mode": "in-memory-only",
+        "free_tier": True,
         "environment": "production" if os.getenv("PORT") else "development"
     }
 
@@ -177,7 +129,7 @@ def login(request: LoginRequest):
 
 @app.get("/api/v1/data/sources")
 def get_data_sources():
-    """Get list of uploaded documents"""
+    """Get list of uploaded documents (in-memory only)"""
     try:
         return {"sources": documents_metadata}
     except Exception as e:
@@ -186,7 +138,7 @@ def get_data_sources():
 
 @app.post("/api/v1/data/upload")
 async def upload_files(files: List[UploadFile] = File(...)):
-    """Upload and process files"""
+    """Upload and process files (in-memory only)"""
     try:
         uploaded_files = []
         
@@ -194,15 +146,14 @@ async def upload_files(files: List[UploadFile] = File(...)):
             if not file.filename.endswith('.pdf'):
                 continue
                 
-            # Save file
-            file_path = os.path.join(DATA_PATH, file.filename)
+            # Read file content into memory
             content = await file.read()
             
-            with open(file_path, 'wb') as f:
-                f.write(content)
+            # Extract text directly from bytes (no file system storage)
+            text_content = extract_text_from_pdf_bytes(content)
             
-            # Extract text
-            text_content = extract_text_from_pdf(file_path)
+            if not text_content:
+                continue
             
             # Create metadata
             doc_id = file.filename
@@ -215,7 +166,7 @@ async def upload_files(files: List[UploadFile] = File(...)):
                 "size": f"{len(content) / 1024:.1f} KB"
             }
             
-            # Store in memory and metadata
+            # Store in memory ONLY
             documents_store[doc_id] = text_content
             
             # Add to metadata list (avoid duplicates)
@@ -225,14 +176,12 @@ async def upload_files(files: List[UploadFile] = File(...)):
             documents_metadata.append(metadata)
             
             uploaded_files.append(file.filename)
-            print(f"Processed: {file.filename}")
-        
-        # Save metadata to file
-        save_documents_database()
+            print(f"✅ Processed in memory: {file.filename}")
         
         return {
-            "message": f"Successfully uploaded {len(uploaded_files)} files",
-            "files": uploaded_files
+            "message": f"Successfully uploaded {len(uploaded_files)} files to memory",
+            "files": uploaded_files,
+            "note": "Files are stored in memory only and will be lost on service restart"
         }
         
     except Exception as e:
@@ -241,7 +190,7 @@ async def upload_files(files: List[UploadFile] = File(...)):
 
 @app.delete("/api/v1/data/sources/{source_id}")
 def delete_source(source_id: str):
-    """Delete a document source"""
+    """Delete a document source (from memory)"""
     try:
         # Remove from memory
         if source_id in documents_store:
@@ -250,13 +199,7 @@ def delete_source(source_id: str):
         # Remove from metadata
         documents_metadata[:] = [doc for doc in documents_metadata if doc['id'] != source_id]
         
-        # Remove file
-        file_path = os.path.join(DATA_PATH, source_id)
-        if os.path.exists(file_path):
-            os.remove(file_path)
-        
-        save_documents_database()
-        return {"message": "Source deleted successfully"}
+        return {"message": "Source deleted successfully from memory"}
         
     except Exception as e:
         print(f"Delete error: {e}")
@@ -264,21 +207,21 @@ def delete_source(source_id: str):
 
 @app.post("/api/v1/chat")
 def chat(request: ChatRequest):
-    """Simple chat endpoint with document search"""
+    """Chat endpoint with document search"""
     try:
-        print(f"Chat request: {request.question}")
+        print(f"💬 Chat request: {request.question}")
         
         if not GOOGLE_API_KEY:
             return {"answer": "Google Gemini API is not configured. Please add GOOGLE_API_KEY to your environment variables."}
         
         if not documents_store:
-            return {"answer": "No documents have been uploaded yet. Please upload some documents first!"}
+            return {"answer": "No documents have been uploaded yet. Please upload some PDF documents first! Note: On free tier, documents are stored temporarily and may be lost when the service restarts."}
         
         # Search for relevant documents
         relevant_docs = search_documents(request.question)
         
         if not relevant_docs:
-            return {"answer": "I couldn't find any relevant information in the uploaded documents for your question."}
+            return {"answer": "I couldn't find any relevant information in the uploaded documents for your question. Try uploading more specific documents or rephrasing your question."}
         
         # Prepare context for Gemini
         context = "\n\n".join(relevant_docs[:3])  # Use top 3 matches
@@ -305,15 +248,15 @@ Answer:"""
             response = model.generate_content(prompt)
             answer = response.text
             
-            print(f"Generated answer: {answer[:100]}...")
+            print(f"✅ Generated answer: {answer[:100]}...")
             return {"answer": answer}
             
         except Exception as e:
-            print(f"Gemini API error: {e}")
+            print(f"❌ Gemini API error: {e}")
             return {"answer": f"I found relevant information in the documents, but encountered an error generating the response: {str(e)}"}
     
     except Exception as e:
-        print(f"Chat error: {e}")
+        print(f"❌ Chat error: {e}")
         return {"answer": "I'm sorry, I encountered an error while processing your question. Please try again."}
 
 if __name__ == "__main__":
