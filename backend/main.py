@@ -28,8 +28,9 @@ app = FastAPI(title="AI Chatbot API - Free Tier", version="2.0.0")
 FRONTEND_URLS = [
     "http://localhost:3000",
     "http://localhost:8080", 
-    "https://ai-chatbot-app.onrender.com",
-    "https://*.onrender.com"
+    "https://ai-chatbot-app-j7o8.onrender.com",
+    "https://*.onrender.com",
+    "*"  # Allow all origins for free tier
 ]
 
 app.add_middleware(
@@ -204,6 +205,11 @@ def delete_source(source_id: str):
     except Exception as e:
         print(f"Delete error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.options("/api/v1/chat")
+def chat_options():
+    """Handle CORS preflight for chat endpoint"""
+    return {"status": "ok"}
 
 @app.post("/api/v1/chat")
 def chat(request: ChatRequest):
