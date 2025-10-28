@@ -61,7 +61,7 @@ This guide will help you deploy your document-based chatbot to Render with full 
 
 5. **Build & Deploy Settings**:
    ```
-   Build Command: cd backend && pip install -r requirements_simple.txt
+   Build Command: cd backend && pip install --upgrade pip && pip install -r requirements_simple.txt
    Start Command: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
    ```
 
