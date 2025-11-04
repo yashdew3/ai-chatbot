@@ -1,6 +1,24 @@
 # 🚀 AI Chatbot Supabase Edition - Complete Deployment Guide
 
-## 📋 **What We're Deploying**
+## � **URGENT: Backend Build Fix Required**
+
+Your backend failed due to dependency issues. I've fixed this! Follow these steps:
+
+### **Immediate Fix Steps:**
+1. **✅ Updated requirements.txt** - Fixed pydantic compatibility with Python 3.13
+2. **✅ Set Root Directory** - Use `backend` as root directory in Render
+3. **✅ Updated Backend URL** - Your URL: `https://ai-chatbot-backend-r0rm.onrender.com`
+
+### **Re-deploy Backend:**
+1. Go to your Render backend service
+2. **Settings** → **Root Directory** → Set to `backend`
+3. **Settings** → **Build Command** → `pip install -r requirements.txt`
+4. **Settings** → **Start Command** → `python main_supabase.py`
+5. **Manual Deploy** → Deploy latest commit
+
+---
+
+## �📋 **What We're Deploying**
 - **Frontend**: ChatDemo.tsx (clean interface, no admin section)
 - **Backend**: main_supabase.py (Supabase + Google Gemini AI)
 - **Database**: Supabase (persistent document storage)
@@ -83,9 +101,10 @@ Name: AI-Chatbot-Backend
 Environment: Python 3
 Region: Oregon (or closest to you)
 Branch: main
+Root Directory: backend
 
-Build Command: pip install -r backend/requirements.txt
-Start Command: cd backend && python main_supabase.py
+Build Command: pip install -r requirements.txt
+Start Command: python main_supabase.py
 ```
 
 ### 3.3 Environment Variables:
@@ -99,7 +118,7 @@ PORT = 8000
 ### 3.4 Deploy Backend:
 - Click **"Create Web Service"**
 - Wait 5-10 minutes for deployment
-- Copy the backend URL: `https://ai-chatbot-backend-xxxx.onrender.com`
+- Your backend URL: `https://ai-chatbot-backend-r0rm.onrender.com`
 
 ---
 
@@ -120,9 +139,8 @@ Publish Directory: ./dist
 
 ### 4.3 Environment Variables:
 ```
-VITE_BACKEND_URL = https://ai-chatbot-backend-xxxx.onrender.com
+VITE_BACKEND_URL = https://ai-chatbot-backend-r0rm.onrender.com
 ```
-*(Replace with your actual backend URL from step 3.4)*
 
 ### 4.4 Deploy Frontend:
 - Click **"Create Static Site"**
@@ -134,7 +152,7 @@ VITE_BACKEND_URL = https://ai-chatbot-backend-xxxx.onrender.com
 ## 🧪 **Step 5: Test Your Deployment**
 
 ### Backend Test:
-Visit: `https://your-backend-url.onrender.com/test`
+Visit: `https://ai-chatbot-backend-r0rm.onrender.com/test`
 
 **Expected Response:**
 ```json
@@ -196,7 +214,16 @@ FRONTEND_URLS = [
 
 ## 🔧 **Troubleshooting**
 
+### ⚠️ **FIXED: Render Build Issues**
+**Problem:** `pydantic-core` compilation errors with Python 3.13
+**Solution:** ✅ Updated requirements.txt with compatible versions
+
 ### Common Issues:
+
+**❌ Build Failed - Dependency Errors:**
+- ✅ Use updated requirements.txt (fixed pydantic versions)
+- Set Root Directory to `backend` in Render dashboard
+- Use Build Command: `pip install -r requirements.txt`
 
 **❌ CORS Errors:**
 - Add your frontend URL to backend CORS configuration

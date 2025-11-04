@@ -43,9 +43,9 @@ FRONTEND_URLS = [
     "http://localhost:3000",
     "http://localhost:5173",
     "http://localhost:8080", 
-    "https://ai-chatbot-app-j7o8.onrender.com",
+    "https://ai-chatbot-frontend-xxxx.onrender.com",  # Update with your actual frontend URL
     "https://*.onrender.com",
-    "*"  # Allow all origins for demo
+    "*"  # Allow all origins for demo - remove this in production for security
 ]
 
 app.add_middleware(
