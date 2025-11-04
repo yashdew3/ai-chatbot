@@ -34,10 +34,12 @@ const Index = () => {
                   <FaArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Button variant="outline" className="border-border hover:bg-secondary/50 px-8 py-3 text-lg">
-                Try Demo Chat
-                <FaComments className="ml-2 h-5 w-5" />
-              </Button>
+              <Link to="/chat">
+                <Button variant="outline" className="border-border hover:bg-secondary/50 px-8 py-3 text-lg">
+                  Try Demo Chat
+                  <FaComments className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

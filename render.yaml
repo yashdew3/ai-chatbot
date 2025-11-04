@@ -1,0 +1,32 @@
+# Render.com Deployment Configuration
+
+# This file tells Render how to deploy your services
+
+services:
+  # Backend Service
+  - type: web
+    name: ai-chatbot-backend
+    env: python
+    buildCommand: "pip install -r backend/requirements.txt"
+    startCommand: "cd backend && python main_supabase.py"
+    plan: free
+    region: oregon
+    environmentVariables:
+      - key: GOOGLE_API_KEY
+        sync: false  # Set this manually in Render dashboard
+      - key: SUPABASE_ANON_KEY
+        sync: false  # Set this manually in Render dashboard
+      - key: PORT
+        value: 8000
+
+  # Frontend Service  
+  - type: web
+    name: ai-chatbot-frontend
+    env: static
+    buildCommand: "npm install && npm run build"
+    staticPublishPath: "./dist"
+    plan: free
+    region: oregon
+    environmentVariables:
+      - key: VITE_BACKEND_URL
+        value: https://ai-chatbot-backend.onrender.com  # Update this with your actual backend URL
