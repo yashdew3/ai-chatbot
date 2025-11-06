@@ -1,7 +1,7 @@
 # 🤖 AI Chatbot - Intelligent Customer Support
 
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Try_Now-blue?style=for-the-badge)](https://ai-chatbot-frontend-97tm.onrender.com/)
-[![Powered by](https://img.shields.io/badge/Powered_by-Supabase_+_Google_AI-green?style=for-the-badge)](https://ai-chatbot-frontend-97tm.onrender.com/)
+[![Powered by](https://img.shields.io/badge/Powered_by-MongoDB+_Google_AI-green?style=for-the-badge)](https://ai-chatbot-frontend-97tm.onrender.com/)
 
 > **Experience our intelligent AI chatbot powered by advanced document understanding and Google Gemini AI**
 
@@ -54,13 +54,13 @@
 ### Backend
 - **FastAPI** (Python) for high-performance API
 - **Google Gemini AI** for intelligent responses
-- **Supabase** for real-time database and storage
+- **MongoDB** for real-time database and storage
 - **PostgreSQL** for reliable data persistence
 
 ### Infrastructure
 - **Render.com** for deployment and hosting
 - **GitHub** for version control and CI/CD
-- **Supabase Cloud** for database and file storage
+- **MongoDB Cloud** for database and file storage
 
 ---
 
@@ -70,7 +70,7 @@
 graph TD
     A[User asks question] --> B[Frontend sends request]
     B --> C[Backend searches knowledge base]
-    C --> D[Supabase returns relevant documents]
+    C --> D[MongoDB returns relevant documents]
     D --> E[Google Gemini AI generates response]
     E --> F[Response sent to user]
     F --> G[Conversation saved to database]
